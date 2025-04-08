@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor's Notes</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --primary-light: #e8f0fe;
+            --danger: #d32f2f;
+            --text: #202124;
+            --text-light: #5f6368;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg);
+        }
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-light);
+        }
+        .notes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .add-note-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .notes-timeline {
+            position: relative;
+            padding-left: 20px;
+        }
+        .notes-timeline::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--primary-light);
+        }
+        .note-item {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        .note-item::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 5px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--primary);
+        }
+        .note-header {
+            background-color: white;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .note-date {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        .note-content {
+            padding: 12px;
+            background-color: white;
+            border-radius: 0 0 6px 6px;
+            display: none;
+        }
+        .note-content.active {
+            display: block;
+        }
+        .note-diagnosis {
+            color: var(--danger);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Doctor's Notes</h1>
+    </div>
+
+    <div class="notes-container">
+        <div class="notes-header">
+            <h2>Doctor's Notes</h2>
+            <button class="add-note-btn" id="addNoteBtn">Add Note</button>
+        </div>
+        <div id="notesContainer">
+            <div class="loading">Loading notes...</div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration - Update these values
+        const PATIENT_ID = 2; // The patient ID to filter notes for
+        const API_TOKEN = 'W9VpqXB6LbtdBOOVpjiLa8kgR1NzYCW7'; // Your API token
+        const NOTES_TABLE_ID = 497974; // Your table ID for doctor's notes
+        
+        // API endpoints
+        const API_URL = `https://api.baserow.io/api/database/rows/table/${NOTES_TABLE_ID}/`;
+        const GET_NOTES_URL = `${API_URL}?user_field_names=true&filter__field_3930959=${PATIENT_ID}`;
+        const CREATE_NOTE_URL = `${API_URL}?user_field_names=true`;
+
+        // DOM elements
+        const notesContainer = document.getElementById('notesContainer');
+        const addNoteBtn = document.getElementById('addNoteBtn');
+
+        // Fetch doctor's notes
+        async function fetchNotes() {
+            try {
+                const response = await fetch(GET_NOTES_URL, {
+                    headers: {
+                        'Authorization': `Token ${API_TOKEN}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch notes');
+                }
+
+                const data = await response.json();
+                displayNotes(data.results);
+            } catch (error) {
+                notesContainer.innerHTML = `<div class="error">Error loading notes: ${error.message}</div>`;
+                console.error('Error:', error);
+            }
+        }
+
+        // Display notes
+        function displayNotes(notes) {
+            if (!notes || notes.length === 0) {
+                notesContainer.innerHTML = '<div class="loading">No notes found</div>';
+                return;
+            }
+
+            // Sort by date (newest first)
+            notes.sort((a, b) => new Date(b.Date) - new Date(a.Date));
+
+            let html = '<div class="notes-timeline">';
+            
+            notes.forEach((note, index) => {
+                html += `
+                    <div class="note-item">
+                        <div class="note-header" onclick="toggleNote(${index})">
+                            <div class="note-date">${note.Date || 'No date'}</div>
+                            <div>${note.Diagnosis || 'No diagnosis'}</div>
+                        </div>
+                        <div class="note-content" id="note-${index}">
+                            <p><strong>Complaints:</strong> ${note['Presenting Complaints'] || 'None'}</p>
+                            <p><strong>Findings:</strong> ${note['Examination Findings'] || 'None'}</p>
+                            <p class="note-diagnosis"><strong>Diagnosis:</strong> ${note.Diagnosis || 'None'}</p>
+                            <p><strong>Plan:</strong> ${note.Plan || 'None'}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            notesContainer.innerHTML = html;
+        }
+
+        // Toggle note details
+        function toggleNote(index) {
+            const note = document.getElementById(`note-${index}`);
+            note.classList.toggle('active');
+        }
+
+        // Add new note
+        function addNote() {
+            // Simple form for demonstration - in production you'd want a proper modal/form
+            const date = new Date().toISOString().split('T')[0];
+            const doctor = "Dr. Smith";
+            const complaints = prompt("Presenting complaints:");
+            const findings = prompt("Examination findings:");
+            const diagnosis = prompt("Diagnosis:");
+            const plan = prompt("Plan:");
+
+            if (complaints && findings && diagnosis && plan) {
+                createNote({
+                    Date: date,
+                    Doctor: doctor,
+                    'Presenting Complaints': complaints,
+                    'Examination Findings': findings,
+                    Diagnosis: diagnosis,
+                    Plan: plan,
+                    field_3930959: PATIENT_ID
+                });
+            }
+        }
+
+        // Create new note via API
+        async function createNote(data) {
+            try {
+                const response = await fetch(CREATE_NOTE_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Token ${API_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to create note');
+                }
+
+                // Refresh notes after successful creation
+                fetchNotes();
+            } catch (error) {
+                console.error('Error creating note:', error);
+                alert('Error creating note: ' + error.message);
+            }
+        }
+
+        // Event listeners
+        addNoteBtn.addEventListener('click', addNote);
+        window.toggleNote = toggleNote;
+
+        // Initialize
+        fetchNotes();
+    </script>
+</body>
+</html>
