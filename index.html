@@ -8,31 +8,52 @@
         :root {
             --primary: #1a73e8;
             --primary-light: #e8f0fe;
+            --secondary: #34a853;
             --danger: #d32f2f;
+            --warning: #f9ab00;
             --text: #202124;
             --text-light: #5f6368;
             --bg: #f8f9fa;
             --card-bg: #ffffff;
         }
         body {
-            font-family: 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             line-height: 1.6;
             color: var(--text);
-            margin: 0;
+            max-width: 1200px;
+            margin: 0 auto;
             padding: 20px;
             background-color: var(--bg);
         }
         .header {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary), #0d47a1);
             color: white;
-            padding: 15px;
-            border-radius: 8px;
+            padding: 15px 25px;
+            border-radius: 12px;
             margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .patient-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
         }
         .loading {
             text-align: center;
             padding: 40px;
+            font-size: 1.1rem;
             color: var(--text-light);
+        }
+        .error {
+            color: var(--danger);
+            background-color: #ffebee;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
         }
         .notes-header {
             display: flex;
@@ -40,22 +61,62 @@
             align-items: center;
             margin-bottom: 20px;
         }
+        .notes-title {
+            color: var(--primary);
+            margin: 0;
+        }
         .add-note-btn {
             background-color: var(--primary);
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
             cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
         }
+        .add-note-btn:hover {
+            background-color: #0d5bba;
+        }
+        .add-note-btn svg {
+            margin-right: 8px;
+            width: 16px;
+            height: 16px;
+        }
+        .no-notes {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+        .show-more-btn {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 20px auto;
+            display: block;
+        }
+        .show-more-btn:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+        /* Doctors Notes Timeline */
         .notes-timeline {
             position: relative;
-            padding-left: 20px;
+            padding-left: 30px;
+            margin-top: 20px;
         }
         .notes-timeline::before {
             content: '';
             position: absolute;
-            left: 7px;
+            left: 10px;
             top: 0;
             bottom: 0;
             width: 2px;
@@ -63,186 +124,445 @@
         }
         .note-item {
             position: relative;
-            margin-bottom: 15px;
+            padding-bottom: 25px;
         }
         .note-item::before {
             content: '';
             position: absolute;
-            left: -20px;
+            left: -30px;
             top: 5px;
-            width: 10px;
-            height: 10px;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
             background: var(--primary);
+            border: 2px solid white;
         }
         .note-header {
-            background-color: white;
-            padding: 12px;
-            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             cursor: pointer;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+        }
+        .note-header:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         .note-date {
             font-weight: 600;
             color: var(--primary);
         }
+        .note-doctor {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+        .note-summary {
+            margin-top: 5px;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
         .note-content {
-            padding: 12px;
+            padding: 15px;
             background-color: white;
-            border-radius: 0 0 6px 6px;
+            border-radius: 0 0 8px 8px;
+            margin-top: -5px;
             display: none;
+            animation: fadeIn 0.3s ease;
         }
         .note-content.active {
             display: block;
+        }
+        .note-detail {
+            margin-bottom: 10px;
+        }
+        .note-detail-label {
+            font-weight: 600;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        .note-detail-value {
+            font-size: 1rem;
         }
         .note-diagnosis {
             color: var(--danger);
             font-weight: 600;
         }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .icon {
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @media (max-width: 768px) {
+            .patient-name {
+                font-size: 1.5rem;
+            }
+            .notes-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>Doctor's Notes</h1>
+        <h1 class="patient-name" id="patientName">Doctor's Notes</h1>
     </div>
 
     <div class="notes-container">
         <div class="notes-header">
-            <h2>Doctor's Notes</h2>
-            <button class="add-note-btn" id="addNoteBtn">Add Note</button>
+            <h2 class="notes-title">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"></path>
+                </svg>
+                Doctor's Notes
+            </h2>
+            <button class="add-note-btn" id="addNoteBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14"></path>
+                </svg>
+                Add Note
+            </button>
         </div>
         <div id="notesContainer">
-            <div class="loading">Loading notes...</div>
+            <div class="loading">Loading doctor's notes...</div>
         </div>
+        <button id="showMoreNotesBtn" class="show-more-btn" style="display: none;">
+            Show More Notes
+        </button>
     </div>
 
     <script>
-        // Configuration - Update these values
-        const PATIENT_ID = 2; // The patient ID to filter notes for
-        const API_TOKEN = 'W9VpqXB6LbtdBOOVpjiLa8kgR1NzYCW7'; // Your API token
-        const NOTES_TABLE_ID = 497974; // Your table ID for doctor's notes
-        
-        // API endpoints
-        const API_URL = `https://api.baserow.io/api/database/rows/table/${NOTES_TABLE_ID}/`;
-        const GET_NOTES_URL = `${API_URL}?user_field_names=true&filter__field_3930959=${PATIENT_ID}`;
-        const CREATE_NOTE_URL = `${API_URL}?user_field_names=true`;
+        // Constants
+        const ROW_ID = 2; // Patient ID to filter notes for
+        const API_BASE_URL = 'https://api.baserow.io/api/database/rows/table';
+        const NOTES_TABLE_ID = 497974;
+        const NOTES_API_URL = `${API_BASE_URL}/${NOTES_TABLE_ID}/?user_field_names=true&filter__field_3930959=${ROW_ID}`;
+        const NOTES_CREATE_URL = `${API_BASE_URL}/${NOTES_TABLE_ID}/?user_field_names=true`;
+        const DOCTOR = "Dr. Smith"; // Default doctor name
 
-        // DOM elements
+        // DOM Elements
         const notesContainer = document.getElementById('notesContainer');
         const addNoteBtn = document.getElementById('addNoteBtn');
+        const showMoreNotesBtn = document.getElementById('showMoreNotesBtn');
+
+        // State variables
+        let allNotes = [];
+        let displayedNotes = 3;
 
         // Fetch doctor's notes
-        async function fetchNotes() {
+        async function fetchDoctorNotes() {
             try {
-                const response = await fetch(GET_NOTES_URL, {
+                notesContainer.innerHTML = '<div class="loading">Loading doctor\'s notes...</div>';
+                const response = await fetch(NOTES_API_URL, {
                     headers: {
-                        'Authorization': `Token ${API_TOKEN}`
+                        'Authorization': 'Token W9VpqXB6LbtdBOOVpjiLa8kgR1NzYCW7'
                     }
                 });
 
                 if (!response.ok) {
-                    throw new Error('Failed to fetch notes');
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
                 const data = await response.json();
-                displayNotes(data.results);
+                allNotes = data.results;
+                displayDoctorNotes(allNotes.slice(0, displayedNotes));
+
+                // Show "Show More" button if there are more notes to display
+                if (allNotes.length > displayedNotes) {
+                    showMoreNotesBtn.style.display = 'block';
+                } else {
+                    showMoreNotesBtn.style.display = 'none';
+                }
+
             } catch (error) {
-                notesContainer.innerHTML = `<div class="error">Error loading notes: ${error.message}</div>`;
-                console.error('Error:', error);
+                console.error('Error fetching doctor\'s notes:', error);
+                notesContainer.innerHTML = `
+                    <div class="error">
+                        <h3>Error Loading Doctor\'s Notes</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
             }
         }
 
-        // Display notes
-        function displayNotes(notes) {
+        // Display doctor's notes in timeline format
+        function displayDoctorNotes(notes) {
             if (!notes || notes.length === 0) {
-                notesContainer.innerHTML = '<div class="loading">No notes found</div>';
+                notesContainer.innerHTML = '<div class="no-notes">No doctor\'s notes found for this patient.</div>';
+                showMoreNotesBtn.style.display = 'none';
                 return;
             }
 
             // Sort by date (newest first)
             notes.sort((a, b) => new Date(b.Date) - new Date(a.Date));
 
-            let html = '<div class="notes-timeline">';
-            
+            let notesHTML = '<div class="notes-timeline">';
+
             notes.forEach((note, index) => {
-                html += `
+                const date = note.Date ? new Date(note.Date).toLocaleDateString() : 'No date';
+                const diagnosis = note.Diagnosis || 'No diagnosis recorded';
+                const complaints = note['Presenting Complaints'] || 'No complaints recorded';
+                const examination = note['Examination Findings'] || 'No examination findings recorded';
+                const plan = note.Plan || 'No plan recorded';
+
+                notesHTML += `
                     <div class="note-item">
-                        <div class="note-header" onclick="toggleNote(${index})">
-                            <div class="note-date">${note.Date || 'No date'}</div>
-                            <div>${note.Diagnosis || 'No diagnosis'}</div>
+                        <div class="note-header" onclick="toggleNoteDetails(${index})">
+                            <div>
+                                <div class="note-date">${date}</div>
+                                <div class="note-summary">${diagnosis}</div>
+                            </div>
+                            <div class="note-doctor">${note.Doctor || 'Unknown Doctor'}</div>
                         </div>
-                        <div class="note-content" id="note-${index}">
-                            <p><strong>Complaints:</strong> ${note['Presenting Complaints'] || 'None'}</p>
-                            <p><strong>Findings:</strong> ${note['Examination Findings'] || 'None'}</p>
-                            <p class="note-diagnosis"><strong>Diagnosis:</strong> ${note.Diagnosis || 'None'}</p>
-                            <p><strong>Plan:</strong> ${note.Plan || 'None'}</p>
+                        <div class="note-content" id="noteContent${index}">
+                            <div class="note-detail">
+                                <div class="note-detail-label">Presenting Complaints</div>
+                                <div class="note-detail-value">${complaints}</div>
+                            </div>
+                            <div class="note-detail">
+                                <div class="note-detail-label">Examination Findings</div>
+                                <div class="note-detail-value">${examination}</div>
+                            </div>
+                            <div class="note-detail">
+                                <div class="note-detail-label">Diagnosis</div>
+                                <div class="note-detail-value note-diagnosis">${diagnosis}</div>
+                            </div>
+                            <div class="note-detail">
+                                <div class="note-detail-label">Plan</div>
+                                <div class="note-detail-value">${plan}</div>
+                            </div>
                         </div>
                     </div>
                 `;
             });
 
-            html += '</div>';
-            notesContainer.innerHTML = html;
+            notesHTML += '</div>';
+            notesContainer.innerHTML = notesHTML;
+            window.notesData = allNotes; // Store all data for reference
         }
 
-        // Toggle note details
-        function toggleNote(index) {
-            const note = document.getElementById(`note-${index}`);
-            note.classList.toggle('active');
+        // Toggle note details visibility
+        function toggleNoteDetails(index) {
+            const noteContent = document.getElementById(`noteContent${index}`);
+            noteContent.classList.toggle('active');
         }
 
-        // Add new note
-        function addNote() {
-            // Simple form for demonstration - in production you'd want a proper modal/form
-            const date = new Date().toISOString().split('T')[0];
-            const doctor = "Dr. Smith";
-            const complaints = prompt("Presenting complaints:");
-            const findings = prompt("Examination findings:");
-            const diagnosis = prompt("Diagnosis:");
-            const plan = prompt("Plan:");
-
-            if (complaints && findings && diagnosis && plan) {
-                createNote({
-                    Date: date,
-                    Doctor: doctor,
-                    'Presenting Complaints': complaints,
-                    'Examination Findings': findings,
-                    Diagnosis: diagnosis,
-                    Plan: plan,
-                    field_3930959: PATIENT_ID
-                });
+        // Show more notes
+        function showMoreNotes() {
+            displayedNotes += 3;
+            if (displayedNotes >= allNotes.length) {
+                showMoreNotesBtn.style.display = 'none';
             }
+            displayDoctorNotes(allNotes.slice(0, displayedNotes));
         }
 
-        // Create new note via API
-        async function createNote(data) {
-            try {
-                const response = await fetch(CREATE_NOTE_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Token ${API_TOKEN}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                });
+        // Open form to add new doctor's note
+        function openDoctorNoteForm() {
+            const formContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Add Doctor's Note</title>
+                    <style>
+                        body {
+                            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                            line-height: 1.6;
+                            color: #333;
+                            padding: 20px;
+                            max-width: 700px;
+                            margin: 0 auto;
+                        }
+                        h2 {
+                            color: #1a73e8;
+                            border-bottom: 2px solid #e0e0e0;
+                            padding-bottom: 10px;
+                            margin-top: 0;
+                        }
+                        .form-group {
+                            margin-bottom: 15px;
+                        }
+                        label {
+                            display: block;
+                            font-weight: 600;
+                            margin-bottom: 5px;
+                            color: #5f6368;
+                            font-size: 0.9rem;
+                        }
+                        input, select, textarea {
+                            width: 100%;
+                            padding: 8px 12px;
+                            border: 1px solid #ddd;
+                            border-radius: 4px;
+                            font-size: 1rem;
+                            box-sizing: border-box;
+                        }
+                        textarea {
+                            min-height: 100px;
+                            resize: vertical;
+                        }
+                        .form-row {
+                            display: grid;
+                            grid-template-columns: 1fr 1fr;
+                            gap: 15px;
+                        }
+                        .form-actions {
+                            margin-top: 25px;
+                            text-align: right;
+                        }
+                        button {
+                            padding: 10px 20px;
+                            border: none;
+                            border-radius: 4px;
+                            font-weight: 600;
+                            cursor: pointer;
+                            transition: all 0.2s;
+                        }
+                        .submit-btn {
+                            background-color: #1a73e8;
+                            color: white;
+                        }
+                        .submit-btn:hover {
+                            background-color: #0d5bba;
+                        }
+                        .cancel-btn {
+                            background-color: #f1f3f4;
+                            color: #5f6368;
+                            margin-right: 10px;
+                        }
+                        .cancel-btn:hover {
+                            background-color: #e0e0e0;
+                        }
+                        .header {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            margin-bottom: 20px;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h2>Add Doctor's Note</h2>
+                    </div>
+                    <form id="doctorNoteForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="date">Date</label>
+                                <input type="date" id="date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="doctor">Doctor</label>
+                                <input type="text" id="doctor" value="${DOCTOR}" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="complaints">Presenting Complaints</label>
+                            <textarea id="complaints"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="history">History of Presenting Complaints</label>
+                            <textarea id="history"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="examination">Examination Findings</label>
+                            <textarea id="examination"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="diagnosis">Diagnosis</label>
+                            <input type="text" id="diagnosis">
+                        </div>
+                        <div class="form-group">
+                            <label for="plan">Plan</label>
+                            <textarea id="plan"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="cancel-btn" onclick="window.close()">Cancel</button>
+                            <button type="submit" class="submit-btn">Submit</button>
+                        </div>
+                    </form>
+                    <script>
+                        document.getElementById('doctorNoteForm').addEventListener('submit', function(e) {
+                            e.preventDefault();
+                            const formData = {
+                                field_3930959: ${ROW_ID}, // Patient ID field
+                                Date: document.getElementById('date').value,
+                                Doctor: document.getElementById('doctor').value,
+                                'Presenting Complaints': document.getElementById('complaints').value,
+                                'History of Presenting Complaints': document.getElementById('history').value,
+                                'Examination Findings': document.getElementById('examination').value,
+                                Diagnosis: document.getElementById('diagnosis').value,
+                                Plan: document.getElementById('plan').value
+                            };
+                            window.opener.postMessage({ 
+                                type: 'SUBMIT_DOCTOR_NOTE', 
+                                data: formData 
+                            }, '*');
+                            window.close();
+                        });
+                        // Set today's date as default
+                        document.getElementById('date').valueAsDate = new Date();
+                    <\/script>
+                </body>
+                </html>
+            `;
 
-                if (!response.ok) {
-                    throw new Error('Failed to create note');
+            const popup = window.open('', 'AddDoctorNote', 'width=800,height=800,scrollbars=yes,resizable=yes');
+            popup.document.write(formContent);
+            popup.document.close();
+        }
+
+        // Handle form submission from popup
+        window.addEventListener('message', async function(event) {
+            if (event.data.type === 'SUBMIT_DOCTOR_NOTE') {
+                try {
+                    const response = await fetch(NOTES_CREATE_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Token W9VpqXB6LbtdBOOVpjiLa8kgR1NzYCW7',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(event.data.data)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to save doctor\'s note');
+                    }
+
+                    // Refresh the notes data
+                    fetchDoctorNotes();
+
+                } catch (error) {
+                    console.error('Error saving doctor\'s note:', error);
+                    alert('Error saving doctor\'s note: ' + error.message);
                 }
-
-                // Refresh notes after successful creation
-                fetchNotes();
-            } catch (error) {
-                console.error('Error creating note:', error);
-                alert('Error creating note: ' + error.message);
             }
-        }
+        });
 
-        // Event listeners
-        addNoteBtn.addEventListener('click', addNote);
-        window.toggleNote = toggleNote;
+        // Make functions available globally
+        window.toggleNoteDetails = toggleNoteDetails;
+        window.openDoctorNoteForm = openDoctorNoteForm;
 
-        // Initialize
-        fetchNotes();
+        // Add event listeners
+        addNoteBtn.addEventListener('click', openDoctorNoteForm);
+        showMoreNotesBtn.addEventListener('click', showMoreNotes);
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', fetchDoctorNotes);
     </script>
 </body>
 </html>
